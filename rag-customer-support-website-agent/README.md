@@ -4,6 +4,8 @@ An n8n AI agent that answers questions about a website using **retrieval-augment
 generation (RAG)** — it only answers from content actually scraped from the site,
 never from the model's general knowledge.
 
+![Workflow overview](./workflow.png)
+
 Built for [DevZink](https://devzink.com) — the agent knows DevZink's services,
 company info, and contact details because it ingested devzink.com itself.
 
