@@ -1,0 +1,576 @@
+{
+  "name": "RAG Customer Support Website Agent",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -608,
+        -384
+      ],
+      "id": "a788039d-adfd-4308-b1e8-c4ed947825da",
+      "name": "When clicking \u2018Execute workflow\u2019"
+    },
+    {
+      "parameters": {
+        "numberInputs": 4
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        224,
+        -384
+      ],
+      "id": "c48e4f9a-ebc5-49ed-afce-8dd7980af0c7",
+      "name": "Merge"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        880,
+        -128
+      ],
+      "id": "346c0c2f-7f13-460b-b7cb-8aec5640af55",
+      "name": "Embeddings Google Gemini",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        224,
+        -800
+      ],
+      "id": "c234f160-0857-44bb-863e-01e9a8a67cff",
+      "name": "When chat message received",
+      "webhookId": "c633762b-4f7c-4b5e-b66e-8957368fd35c"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are an expert AI assistant for Devzink Technologies. Your job is to answer user queries strictly, accurately, and precisely based ONLY on the retrieved data from the Pinecone vector store tool. \n\nRules:\n1. Always use the attached Pinecone Vector Store tool to search for relevant information before answering any user query.\n2. Provide exact details, lists, and facts (such as locations, services, and policies) found in the retrieved documents. Do not omit any items when asked to list all services.\n3. If the answer is not present in the retrieved context, politely state that you don't have the information based on the company documents. Do not assume or make things up."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        496,
+        -800
+      ],
+      "id": "db8ce43a-89a5-4854-932d-71510800dce9",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.1-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        384,
+        -592
+      ],
+      "id": "d632f543-29c5-4f74-9b1e-5d4733193bcc",
+      "name": "Google Gemini Chat Model"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        624,
+        -576
+      ],
+      "id": "583ca929-52fc-417d-a7bf-d3523583be3a",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Use this tool to search and retrieve Devzink website content, company information, services, and location details ,",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "devzink3",
+          "mode": "list",
+          "cachedResultName": "devzink3"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        800,
+        -592
+      ],
+      "id": "2dc89736-5f1a-4489-a138-93b369e5ea8d",
+      "name": "Pinecone Vector Store1"
+    },
+    {
+      "parameters": {
+        "url": "https://devzink.com/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -256,
+        -304
+      ],
+      "id": "56fa9250-b631-42b3-8471-6b4a534f5bdc",
+      "name": "Home page"
+    },
+    {
+      "parameters": {
+        "url": "https://devzink.com/services",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -256,
+        -128
+      ],
+      "id": "008f33aa-d5e0-4f8c-8434-0286c6668add",
+      "name": "Services page"
+    },
+    {
+      "parameters": {
+        "url": "https://devzink.com/about",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -256,
+        -480
+      ],
+      "id": "4dcd13b0-05c1-4a5a-a94a-512b692f2d81",
+      "name": "About us page"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "devzink3",
+          "mode": "list",
+          "cachedResultName": "devzink3"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        432,
+        -352
+      ],
+      "id": "810640d6-de7d-4d55-b144-f10b7a11d4f3",
+      "name": "Pinecone Vector Store2"
+    },
+    {
+      "parameters": {
+        "textSplittingMode": "custom",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        512,
+        -160
+      ],
+      "id": "5622501b-321a-4f34-b22a-25f402a11726",
+      "name": "Default Data Loader1"
+    },
+    {
+      "parameters": {
+        "url": "https://devzink.com/contact",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -256,
+        -656
+      ],
+      "id": "d7a728bc-e044-4306-ba4b-a708ec59b98f",
+      "name": "Contact us page"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "Contact List",
+              "cssSelector": ".contact-side-list"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        -64,
+        -656
+      ],
+      "id": "5f6e2327-9707-4064-9cea-f0ec6a75ba4d",
+      "name": "Data Processing"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "About us intro",
+              "cssSelector": ".aa-intro"
+            },
+            {
+              "key": "What we are",
+              "cssSelector": ".about-compare"
+            },
+            {
+              "key": "How we work?",
+              "cssSelector": ".principles-grid"
+            },
+            {
+              "key": "Who we work with",
+              "cssSelector": ".who-grid"
+            },
+            {
+              "key": "Location",
+              "cssSelector": ".about-reach__row"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        -64,
+        -480
+      ],
+      "id": "79c9cf81-5842-4202-9ddd-3a4a355c733e",
+      "name": "Data Processing1"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "Hero",
+              "cssSelector": ".hero__content"
+            },
+            {
+              "key": "Pain points",
+              "cssSelector": ".problem__grid"
+            },
+            {
+              "key": "Main Services",
+              "cssSelector": ".core-grid"
+            },
+            {
+              "key": "Other Services",
+              "cssSelector": ".sec-grid"
+            },
+            {
+              "key": "Process",
+              "cssSelector": ".process-flow"
+            },
+            {
+              "key": "CTA",
+              "cssSelector": ".cta-band"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        -64,
+        -304
+      ],
+      "id": "12924041-00b0-4bb3-9ef1-070308abaaeb",
+      "name": "Data Processing2"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "service 1",
+              "cssSelector": "#ai-agents"
+            },
+            {
+              "key": "service 2",
+              "cssSelector": "#ai-product"
+            },
+            {
+              "key": "service 3",
+              "cssSelector": "#web"
+            },
+            {
+              "key": "service 4",
+              "cssSelector": "#mobile"
+            },
+            {
+              "key": "service 5",
+              "cssSelector": "#uiux"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        -64,
+        -128
+      ],
+      "id": "11b9c683-986f-40f8-84b7-ce54c8a6aca0",
+      "name": "Data Processing3"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        576,
+        48
+      ],
+      "id": "cc8710e4-2cb1-4931-b5c8-98df2dbaf40f",
+      "name": "Recursive Character Text Splitter"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking \u2018Execute workflow\u2019": {
+      "main": [
+        [
+          {
+            "node": "Contact us page",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "About us page",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Home page",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Services page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          },
+          {
+            "node": "Pinecone Vector Store2",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Home page": {
+      "main": [
+        [
+          {
+            "node": "Data Processing2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Services page": {
+      "main": [
+        [
+          {
+            "node": "Data Processing3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "About us page": {
+      "main": [
+        [
+          {
+            "node": "Data Processing1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader1": {
+      "ai_document": [
+        [
+          {
+            "node": "Pinecone Vector Store2",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contact us page": {
+      "main": [
+        [
+          {
+            "node": "Data Processing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data Processing": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data Processing1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Data Processing2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Data Processing3": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader1",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "nodeGroups": [],
+  "tags": []
+}
